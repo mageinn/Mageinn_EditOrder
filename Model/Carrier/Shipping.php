@@ -37,10 +37,8 @@ use Magento\Shipping\Model\Rate\Result;
 class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implements
     \Magento\Shipping\Model\Carrier\CarrierInterface
 {
-    /**
-     * @var string
-     */
-    protected $_code = 'mageinncutomshipping';
+
+    protected $_code = 'mageinnfreeshipping';
 
     /**
      * @var \Magento\Shipping\Model\Rate\ResultFactory
@@ -84,7 +82,7 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
      */
     public function getAllowedMethods()
     {
-        return ['mageinncutomshipping' => $this->getConfigData('name')];
+        return [$this->_code => $this->getConfigData('name')];
     }
 
     /**
@@ -104,10 +102,10 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = $this->rateMethodFactory->create();
 
-        $method->setCarrier('mageinncutomshipping');
+        $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->getConfigData('title'));
 
-        $method->setMethod('mageinncutomshipping');
+        $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
         /* we used price from config.xml */

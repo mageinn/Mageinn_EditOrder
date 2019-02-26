@@ -28,16 +28,16 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <carriers>
-            <mageinncutomshipping>
+            <mageinnfreeshipping>
                 <active>1</active>
                 <sallowspecific>0</sallowspecific>
                 <model>Mageinn\EditOrder\Model\Carrier\Shipping</model>
-                <name>Mageinn Custom Shipping Method</name>
+                <name>Mageinn Free Shipping Method</name>
                 <price>0.00</price>
-                <title>Mageinn Custom Shipping Method</title>
+                <title>Mageinn Free Shipping Method</title>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <handling_type>F</handling_type>
-            </mageinncutomshipping>
+            </mageinnfreeshipping>
         </carriers>
     </default>
 </config>
