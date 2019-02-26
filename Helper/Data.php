@@ -35,16 +35,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $scopeConfig;
 
     /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+
+    /**
      * Data constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Customer\Model\SessionFactory $customerSession
      * @param Context $context
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Customer\Model\SessionFactory $customerSession,
         Context $context
     )
     {
         $this->scopeConfig = $scopeConfig;
+        $this->customerSession = $customerSession->create();
         parent::__construct($context);
     }
 
@@ -53,8 +61,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getSelectedOrderStatusesAsString(){
-        return $this->scopeConfig->getValue(self::ORDER_STATUSES, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    public function getSelectedOrderStatusesAsString($scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE){
+        return $this->scopeConfig->getValue(self::ORDER_STATUSES, $scope);
     }
 
     /**
@@ -62,8 +70,38 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getSelectedOrderStatusesAsArrat(){
-        $statuses = $this->scopeConfig->getValue(self::ORDER_STATUSES, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    public function getSelectedOrderStatusesAsArray(){
+        $statuses = $this->getSelectedOrderStatusesAsString();
         return explode(',', $statuses);
+    }
+
+
+    /**
+     * Return current customer_id
+     *
+     * @return bool|int|null
+     */
+    public function getLoggedInCustomerId(){
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getId();
+        }
+        return false;
+    }
+
+    public function prepareArrayForComparison(array $data){
+        return [
+            'firstname' => $data['firstname'],
+            'lastname' => $data['lastname'],
+            'region' => (is_array($data['region'])) ? $data['region']['region'] : $data['region'],
+            'postcode' => $data['postcode'],
+            'city' => $data['city'],
+            'street' => $data['street'],
+            'country_id' => $data['country_id'],
+            'company' => $data['company']
+        ];
+    }
+
+    public function isEnabled($scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE){
+        return $this->scopeConfig->getValue(self::MODULE_ENABLE, $scope);
     }
 }

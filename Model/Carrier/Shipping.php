@@ -53,6 +53,10 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
     protected $rateMethodFactory;
 
     /**
+     * @var \Mageinn\EditOrder\Model\Service\FreeShippingService
+     */
+    protected $service;
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
      * @param \Psr\Log\LoggerInterface $logger
@@ -66,10 +70,12 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         \Psr\Log\LoggerInterface $logger,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
+        \Mageinn\EditOrder\Model\Service\FreeShippingService $service,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
+        $this->service = $service;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -87,7 +93,8 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
      */
     public function collectRates(RateRequest $request)
     {
-        if (!$this->getConfigFlag('active')) {
+
+        if (!$this->service->isAvailable()) {
             return false;
         }
 
@@ -103,7 +110,7 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         $method->setMethod('mageinncutomshipping');
         $method->setMethodTitle($this->getConfigData('name'));
 
-        /*you can fetch shipping price from different sources over some APIs, we used price from config.xml - xml node price*/
+        /* we used price from config.xml */
         $amount = $this->getConfigData('price');
 
         $method->setPrice($amount);
