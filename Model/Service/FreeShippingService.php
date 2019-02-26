@@ -76,7 +76,7 @@ class FreeShippingService
 
     /**
      * The main method responsible for working out the service
-     * Checking all conditions
+     * It checks all conditions
      *
      * @return bool
      */
@@ -105,13 +105,11 @@ class FreeShippingService
         $orders = $this->getOrdersByCustomerId($customerId);
 
         foreach ($orders as $order){
-            if(in_array($order->getStatus(), $selectedOrderStatuses)){
-                /**
-                 * @var $order \Magento\Sales\Model\Order
-                 */
-                $address = $order->getShippingAddress()->getData();
-                $this->addressesList[] = $this->helper->prepareArrayForComparison($address);
-            };
+            /**
+             * @var $order \Magento\Sales\Model\Order
+             */
+            $address = $order->getShippingAddress()->getData();
+            $this->addressesList[] = $this->helper->prepareArrayForComparison($address);
         }
 
         return (!empty($this->addressesList)) ? true : false;
@@ -144,6 +142,9 @@ class FreeShippingService
      */
     protected function getOrdersByCustomerId($customerId){
        return  $this->orderCollection->addAttributeToFilter('customer_id', $customerId)
+           ->addAttributeToFilter('status', [
+               'in' => $this->helper->getSelectedOrderStatusesAsArray()
+           ])
            ->load()
            ->getItems();
     }
