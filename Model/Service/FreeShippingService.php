@@ -42,11 +42,11 @@ class FreeShippingService
     private $helper;
 
     /**
-     * List of addresses to which delivery was made earlier
+     * Last order address
      *
      * @var array
      */
-    private $addressesList;
+    private $lastOrderAddress = null;
 
     /**
      * @var \Magento\Checkout\Model\Session
@@ -102,17 +102,18 @@ class FreeShippingService
         //current customer_id
         $customerId = $this->getLoggedinCustomerId();
         $selectedOrderStatuses = $this->helper->getSelectedOrderStatusesAsArray();
-        $orders = $this->getOrdersByCustomerId($customerId);
-
-        foreach ($orders as $order){
-            /**
-             * @var $order \Magento\Sales\Model\Order
-             */
-            $address = $order->getShippingAddress()->getData();
-            $this->addressesList[] = $this->helper->prepareArrayForComparison($address);
+        /**
+         * @var $order \Magento\Sales\Model\Order
+         */
+        $order = $this->getOrderByCustomerId($customerId);
+        if($order){
+            if(in_array($order->getStatus(), $selectedOrderStatuses)){
+                $address = $order->getShippingAddress()->getData();
+                $this->lastOrderAddress = $this->helper->prepareArrayForComparison($address);
+            }
         }
 
-        return (!empty($this->addressesList)) ? true : false;
+        return (!is_null($this->lastOrderAddress)) ? true : false;
     }
 
 
@@ -125,28 +126,27 @@ class FreeShippingService
         $selectedAddress = $this->checkoutSession->getQuote()->getShippingAddress()->getData();
         $selectedAddress = $this->helper->prepareArrayForComparison($selectedAddress);
 
-        foreach ($this->addressesList as $address){
-            $result = array_diff($selectedAddress, $address);
-            if(empty($result)) return true;
-        }
+        $result = array_diff($selectedAddress, $this->lastOrderAddress);
+        if(empty($result)) return true;
 
         return false;
     }
 
 
     /**
-     * Get all orders current customer by customer_id
+     * Get last order of current customer by customer_id
      *
      * @param $customerId
-     * @return \Magento\Framework\DataObject[]
+     * @return \Magento\Framework\DataObject
      */
-    protected function getOrdersByCustomerId($customerId){
+    protected function getOrderByCustomerId($customerId){
        return  $this->orderCollection->addAttributeToFilter('customer_id', $customerId)
-           ->addAttributeToFilter('status', [
-               'in' => $this->helper->getSelectedOrderStatusesAsArray()
-           ])
+//           ->addAttributeToFilter('status', [
+//               'in' => $this->helper->getSelectedOrderStatusesAsArray()
+//           ])
+           ->setOrder('entity_id', 'DESC')
            ->load()
-           ->getItems();
+           ->getFirstItem();
     }
 
     /**
