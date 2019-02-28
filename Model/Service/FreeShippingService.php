@@ -140,13 +140,10 @@ class FreeShippingService
      * @return \Magento\Framework\DataObject
      */
     protected function getOrderByCustomerId($customerId){
-       return  $this->orderCollection->addAttributeToFilter('customer_id', $customerId)
-//           ->addAttributeToFilter('status', [
-//               'in' => $this->helper->getSelectedOrderStatusesAsArray()
-//           ])
-           ->setOrder('entity_id', 'DESC')
-           ->load()
-           ->getFirstItem();
+           return  $this->orderCollection->addAttributeToFilter('customer_id', $customerId)
+               ->setOrder('entity_id', 'DESC')
+               ->load()
+               ->getFirstItem();
     }
 
     /**

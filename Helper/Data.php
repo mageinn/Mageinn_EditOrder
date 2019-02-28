@@ -26,6 +26,7 @@ use Magento\Framework\App\Helper\Context;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
+    const SHIPPING_METHOD = 'mageinnfreeshipping_mageinnfreeshipping';
     const ORDER_STATUSES =  'mageinn_editorder_configuration/general/order_statuses';
     const MODULE_ENABLE = 'mageinn_editorder_configuration/general/enable';
 
