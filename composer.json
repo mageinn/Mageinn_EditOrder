@@ -1,5 +1,5 @@
 {
-    "name": "mageinn/module-editorder",
+    "name": "mageinn/editorder",
     "description": "EditOrder",
     "require": {
         "php": ">=7.0.0"
